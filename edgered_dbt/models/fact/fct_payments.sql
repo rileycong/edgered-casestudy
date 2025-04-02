@@ -9,26 +9,29 @@ with clients_payments_w_history as (
             over (partition by p.client_id order by p.transaction_id) as total_amount_paid_before,
         
         -- Calculate the average amount per transaction before this transaction
-        avg(case when p2.transaction_id < p.transaction_id and p2.payment_code != 'DEFAULT' then p2.payment_amt else null end)
+        avg(case when p2.transaction_id < p.transaction_id and p2.payment_code != 'DEFAULT' then p2.payment_amt else 0 end)
             over (partition by p.client_id order by p.transaction_id) as avg_amount_per_transaction_before,
         
         -- Calculate the number of payments before this transaction
-        count(case when p2.transaction_id < p.transaction_id and p2.payment_code != 'DEFAULT' then 1 else null end) 
+        count(case when p2.transaction_id < p.transaction_id and p2.payment_code != 'DEFAULT' then 1 else 0 end) 
             over (partition by p.client_id order by p.transaction_id) as num_payments_before,
         
         -- Calculate the number of contracts before this transaction
         (select count(distinct p2.contract_id)
             from {{ ref('src_payments') }} p2
             where p2.client_id = p.client_id
-            and p2.transaction_id < p.transaction_id) as num_contracts_before,            
+            and p2.transaction_id < p.transaction_id) as num_contracts_before,     
 
         -- Calculate the number of defaults before this transaction
-        count(case when p2.transaction_id < p.transaction_id and p2.payment_code = 'DEFAULT' then 1 else null end) 
-            over (partition by p.client_id order by p.transaction_id) as num_defaults_before
+        count(case when p2.transaction_id < p.transaction_id and p2.payment_code = 'DEFAULT' then 1 else 0 end) 
+            over (partition by p.client_id order by p.transaction_id) as num_defaults_before,
+        
+         row_number() over (partition by p.transaction_id order by p.transaction_id) as row_num
 
     from {{ ref('src_payments') }} p
     left join {{ ref('src_payments') }} p2 
         on p.client_id = p2.client_id
+        and p2.transaction_id < p.transaction_id
 )
 
 select
@@ -45,3 +48,4 @@ select
     num_defaults_before
 
 from clients_payments_w_history
+where row_num = 1

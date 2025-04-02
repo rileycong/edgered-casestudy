@@ -14,7 +14,7 @@ with aggregated_data as (
 risk_factors as (
     select
         client_id,
-        case
+        max(case
             when entity_type = 'Australian Private Company' and EXTRACT(MONTH from transaction_datetime) = 7 then 1
             when entity_type = 'Australian Public Company' and EXTRACT(MONTH from transaction_datetime) = 2 then 1
             when entity_type = 'Discretionary Investment Trust' and EXTRACT(MONTH from transaction_datetime) in (3, 7) then 1
@@ -24,9 +24,9 @@ risk_factors as (
             when entity_type = 'Individual/Sole Trader' and EXTRACT(MONTH from transaction_datetime) in (4, 5, 7) then 1
             when entity_type = 'Other Partnership' and EXTRACT(MONTH from transaction_datetime) in (8, 10, 11) then 1
             else 0
-        end as in_risky_month,
+        end) as in_risky_month,
 
-        case
+        max(case
             when entity_type = 'Australian Private Company' and entity_age in (10, 12, 17) then 1
             when entity_type = 'Australian Public Company' and entity_age in (12, 13, 16) then 1
             when entity_type = 'Discretionary Investment Trust' and entity_age = 10 then 1
@@ -36,9 +36,9 @@ risk_factors as (
             when entity_type = 'Individual/Sole Trader' and entity_age in (10, 11, 16, 17, 18) then 1
             when entity_type = 'Other Partnership' and entity_age = 14 then 1
             else 0
-        end as in_risky_age,
+        end) as in_risky_age,
 
-        case
+        max(case
             when entity_type = 'Australian Private Company' then 4
             when entity_type = 'Australian Public Company' then 2
             when entity_type = 'Discretionary Investment Trust' then 4
@@ -48,9 +48,10 @@ risk_factors as (
             when entity_type = 'Individual/Sole Trader' then 3
             when entity_type = 'Other Partnership' then 1   
             else 0
-        end as risky_business_types
+        end) as risky_business_types
         
     from {{ ref('dim_payments_w_clients') }}
+    group by client_id
 ),
 
 final_risk_score as (

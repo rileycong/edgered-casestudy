@@ -5,7 +5,7 @@ sources:
     database: edgered-case-study # Your GCP project ID
     schema: edgered_case_study    # The dataset name
     tables:
-      - name: payments     # Table name in BigQuery
+      - name: raw_payments     # Table name in BigQuery
         description: "Cleaned payments data loaded into BigQuery"
-      - name: clients      # Another raw table if needed
+      - name: raw_clients      # Another raw table if needed
         description: "Cleaned clients data loaded into BigQuery"

@@ -63,7 +63,7 @@ def table_exists(project_id: str, dataset_id: str, table_id: str):
 def cleaned_payments_bq(bigquery: BigQueryResource, cleaned_payments: pd.DataFrame):
      
     dataset_id = 'edgered_case_study'
-    table_name = 'payments'
+    table_name = 'raw_payments'
     table_id = f"{dataset_id}.{table_name}"
 
     with bigquery.get_client() as client:
@@ -82,7 +82,7 @@ def cleaned_payments_bq(bigquery: BigQueryResource, cleaned_payments: pd.DataFra
 @asset(group_name="raw_to_bq")
 def cleaned_clients_bq(bigquery: BigQueryResource, cleaned_clients: pd.DataFrame):
     dataset_id = 'edgered_case_study'
-    table_name = 'clients'
+    table_name = 'raw_clients'
     table_id = f"{dataset_id}.{table_name}"
 
     with bigquery.get_client() as client:

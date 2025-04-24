@@ -1,0 +1,9 @@
+resources:
+  gcs:
+    config:
+      project_id: "edgered-case-study"
+      credentials_path: "creds\gcp-access.json"
+  bigquery:
+    config:
+      project_id: "edgered-case-study"
+      credentials_path: "creds\gcp-access.json"

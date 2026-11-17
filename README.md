@@ -32,11 +32,22 @@ The project consists of several main components:
     git clone https://github.com/rileycong/edgered-casestudy.git
     ```
 
-2. Install the required dependencies (make sure you have Python 3.7+):
+2. Install the required dependencies (use Python 3.12):
 
     ```bash
     pip install -r requirements.txt
     ```
+
+The repaired dependency set is tested with Python 3.12. On macOS, XGBoost also
+requires the OpenMP runtime (`brew install libomp`).
+
+The minimum compatible dependency inputs are in `requirements.in`. Regenerate
+the cross-platform pins and check them before reusing this inactive case study:
+
+```bash
+uv pip compile requirements.in --python-version 3.12 --universal --resolution lowest-direct --no-annotate --no-header -o requirements.txt
+pip-audit -r requirements.txt
+```
 
 3. Set up GCP:
 
